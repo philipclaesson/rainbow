@@ -19,6 +19,7 @@ html {
     gap: 5px;
     width: 80vmin;
     height: 80vmin;
+    padding: 2vmin;
 }
 
 .square {

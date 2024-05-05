@@ -153,7 +153,6 @@ async function initAudio() {
   if (isInitiated) {
     return;
   }
-  isInitiated = true;
   await ac.initAudio([
     "stems/drums.wav",
     "stems/hats.wav",
@@ -172,7 +171,7 @@ async function initAudio() {
     "stems/kick-hat.wav",
     "stems/toms.wav",
   ]);
-  //   ac.unMuteTrack(0);
+  isInitiated = true;
 }
 
 function createStartButton() {
@@ -182,9 +181,23 @@ function createStartButton() {
     createUI();
     initUI();
     initAudio();
+    draw();
   });
 }
 
 document.addEventListener("DOMContentLoaded", () => {
   createStartButton();
 });
+
+function draw() {
+  requestAnimationFrame(draw);
+  if (!isInitiated) {
+    return;
+  }
+  for (let i = 0; i < nSquares; i++) {
+    const square = document.getElementById(`square-${i}`) as HTMLElement;
+    if (square) {
+      square.style.backgroundColor = ac.getFrequencyColor(i);
+    }
+  }
+}

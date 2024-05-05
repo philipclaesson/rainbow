@@ -1,14 +1,17 @@
 export class AudioController {
   private audioContext: AudioContext;
-  private tracks: { sourceNode: AudioBufferSourceNode; gainNode: GainNode }[] =
-    [];
+  private tracks: {
+    sourceNode: AudioBufferSourceNode;
+    gainNode: GainNode;
+    analyserNode: AnalyserNode;
+  }[] = [];
 
   constructor() {
     this.audioContext = new AudioContext();
   }
 
   async initAudio(fileNames: string[]): Promise<void> {
-    console.log("Loading audio files...")
+    console.log("Loading audio files...");
     if (fileNames.length !== 16) {
       throw new Error("Expected 16 audio files.");
     }
@@ -26,11 +29,16 @@ export class AudioController {
       sourceNode.buffer = buffer;
       gainNode.gain.value = 0; // Start muted
 
+      // set up an analyser so we can do cool visuals
+      const analyserNode = this.audioContext.createAnalyser();
+      analyserNode.fftSize = 2048;
+      gainNode.connect(analyserNode);
+
       sourceNode.connect(gainNode);
       gainNode.connect(this.audioContext.destination);
 
-      this.tracks.push({ sourceNode, gainNode });
-    
+      this.tracks.push({ sourceNode, gainNode, analyserNode });
+
       sourceNode.loop = true;
       sourceNode.start(0); // Play immediately in sync
     });
@@ -42,8 +50,36 @@ export class AudioController {
     return this.audioContext.decodeAudioData(arrayBuffer);
   }
 
+  getNoiseColor(track: number): string {
+    const analyserNode = this.tracks[track].analyserNode;
+    const dataArray = new Uint8Array(analyserNode.frequencyBinCount);
+    analyserNode.getByteFrequencyData(dataArray);
+
+    const average =
+      dataArray.reduce((acc, val) => acc + val, 0) / dataArray.length;
+    const hue = Math.min(100 + average * 5, 240);
+    return `hsl(${hue}, 100%, 50%)`;
+  }
+
+  getFrequencyColor(track: number): string {
+    const gainNode = this.tracks[track].gainNode;
+    if (gainNode.gain.value === 0) {
+      return "orange";
+    }
+    const analyserNode = this.tracks[track].analyserNode;
+    const dataArray = new Uint8Array(analyserNode.frequencyBinCount);
+    analyserNode.getByteFrequencyData(dataArray);
+
+    // get the highest frequency
+    const max = Math.max(...dataArray);
+    const maxIndex = dataArray.indexOf(max);
+
+    const hue = Math.min(maxIndex * 5, 240);
+    return `hsl(${hue}, 100%, 50%)`;
+  }
+
   unMuteTrack(trackNumber: number): void {
-    console.log("unMuteTrack", trackNumber)
+    console.log("unMuteTrack", trackNumber);
     if (trackNumber == -1) {
       return;
     }
@@ -57,7 +93,7 @@ export class AudioController {
   muteTrack(trackNumber: number): void {
     console.log("muteTrack", trackNumber);
     if (trackNumber == -1) {
-        return;
+      return;
     }
     if (this.tracks[trackNumber]) {
       this.tracks[trackNumber].gainNode.gain.value = 0; // Set gain to 0 to mute
