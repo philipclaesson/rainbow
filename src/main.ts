@@ -5,6 +5,8 @@ const nSquares = 16;
 const nBalls = 3;
 var isPlaying = false;
 var isInitiated = false;
+var mobileUsage = false;
+var ballHome: HTMLElement | null = null;
 
 function createUI() {
   const matrix = document.createElement("div");
@@ -14,14 +16,20 @@ function createUI() {
   for (let i = 0; i < nSquares; i++) {
     const square = document.createElement("div");
     square.classList.add("square");
-    // square.id = `square-${i}`;
+    square.id = `square-${i}`;
     matrix.appendChild(square);
   }
+  ballHome = document.createElement("div");
+  ballHome.classList.add("ballhome");
+  ballHome.id = "ballhome";
+  document.body.appendChild(ballHome);
+
   for (let i = 0; i < nBalls; i++) {
     const ball = document.createElement("div");
     ball.classList.add("ball");
     ball.id = `ball-${i}`;
-    document.body.appendChild(ball);
+    ball.draggable = true;
+    ballHome.appendChild(ball);
   }
 }
 
@@ -32,9 +40,9 @@ function initUI() {
   let originSquare: HTMLElement | null = null;
 
   const dropBall = (target: HTMLElement) => {
-    if (activeBall && target.classList.contains("square")) {
+    if (activeBall) {
       console.log("Dropped:", activeBall.id, target.id);
-      ac.unMuteTrack(idToInt(target.id));
+      ac.unMuteTrack(getSquareId(target.id));
       target.appendChild(activeBall);
       originSquare = null;
       activeBall.style.display = "block"; // Make sure to display the ball again
@@ -47,20 +55,22 @@ function initUI() {
       activeBall = ball;
       originSquare = ball.parentElement as HTMLElement;
       e.dataTransfer?.setData("text/plain", ball.id);
-      console.log("Lifted:", ball.id, "from", originSquare.id);
-      ac.muteTrack(idToInt(originSquare.id));
+      console.log("[Dragstart]: Lifted", ball.id, "from", originSquare.id);
+      ac.muteTrack(getSquareId(originSquare.id));
     });
 
     ball.addEventListener("touchstart", (e: TouchEvent) => {
+      mobileUsage = true;
       activeBall = ball;
       originSquare = ball.parentElement as HTMLElement;
-      console.log("Lifted:", ball.id, "from", originSquare.id);
-      e.preventDefault();
-      ac.muteTrack(idToInt(originSquare.id));
+      console.log("[Touchstart] Lifted", ball.id, "from", originSquare.id);
+      ac.muteTrack(getSquareId(originSquare.id));
     });
 
     ball.addEventListener("touchmove", (e: TouchEvent) => {
+      console.log("[Touchmove] Dragging", ball.id, e.touches.length);
       e.preventDefault();
+      mobileUsage = true;
       if (e.touches.length === 1) {
         const touch = e.touches[0];
         ball.style.left = `${touch.clientX - 25}px`; // Adjust for center of the ball
@@ -69,40 +79,70 @@ function initUI() {
     });
 
     ball.addEventListener("touchend", (e: TouchEvent) => {
+      console.log("[Touchend] Dropped", ball.id);
       if (!activeBall) return;
-      activeBall.style.display = "none"; // Temporarily hide the ball to get element underneath
+      showBalls(false);
       const touch = e.changedTouches[0];
       const targetElement = document.elementFromPoint(
         touch.clientX,
         touch.clientY
       ) as HTMLElement;
-      activeBall.style.display = "block"; // Re-display the ball
+      showBalls(true);
       dropBall(targetElement);
-      //   console.log("Dropped:", ball.id, targetElement.id);
     });
   });
 
   squares.forEach((square) => {
-    if (!square.id) {
-      square.id = `square-${Array.from(squares).indexOf(square)}`;
-    }
     square.addEventListener("dragover", (e: DragEvent) => {
       e.preventDefault();
     });
 
     square.addEventListener("drop", (e: DragEvent) => {
       e.preventDefault();
-      const data = e.dataTransfer?.getData("text");
-      if (data) {
-        const ball = document.getElementById(data) as HTMLElement;
-        dropBall(square);
-      }
+      dropBall(square);
     });
+  });
+
+  if (!ballHome) {
+    throw new Error("Ball home not found");
+  }
+  ballHome.addEventListener("dragover", (e: DragEvent) => {
+    e.preventDefault();
+  });
+
+  ballHome.addEventListener("drop", (e: DragEvent) => {
+    e.preventDefault();
+    if (!ballHome) {
+      throw new Error("Ball home not found");
+    }
+    dropBall(ballHome);
+  });
+
+  document.addEventListener("dragover", (e) => {
+    if (!mobileUsage) {
+      e.preventDefault(); // This allows the drop to be accepted.
+    }
+  });
+  document.addEventListener("drop", (e) => {
+    if (!mobileUsage) {
+      const ballHome = document.getElementById("ballhome") as HTMLElement;
+      dropBall(ballHome);
+    }
   });
 }
 
-function idToInt(id: string): number {
-  const parts = id.split("-");
+function showBalls(show: boolean) {
+  const balls: NodeListOf<HTMLElement> = document.querySelectorAll(".ball");
+  balls.forEach((ball) => {
+    ball.style.display = show ? "block" : "none";
+  });
+}
+
+function getSquareId(id: string | null): number {
+  if (!id) {
+    return -1;
+  }
+  const parts = id.split("square-");
   if (parts.length < 2) {
     return -1;
   }
