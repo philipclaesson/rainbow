@@ -174,13 +174,28 @@ async function initAudio() {
   isInitiated = true;
 }
 
+function spinner(show: boolean) {
+  if (show) {
+    const spinner = document.createElement("div");
+
+    spinner.classList.add("spinner");
+    spinner.id = "spinner";
+    document.body.appendChild(spinner);
+  } else {
+    const spinner = document.getElementById("spinner");
+    spinner?.remove();
+  }
+}
+
 function createStartButton() {
   const startButton = document.getElementById("start-button");
-  startButton?.addEventListener("click", () => {
+  startButton?.addEventListener("click", async () => {
     startButton.remove();
+    spinner(true);
+    await initAudio();
+    spinner(false);
     createUI();
     initUI();
-    initAudio();
     draw();
   });
 }

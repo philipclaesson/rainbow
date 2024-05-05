@@ -5,13 +5,13 @@ export class AudioController {
     gainNode: GainNode;
     analyserNode: AnalyserNode;
   }[] = [];
+  private slowAverage: number = 39; // orange
 
   constructor() {
     this.audioContext = new AudioContext();
   }
 
   async initAudio(fileNames: string[]): Promise<void> {
-    console.log("Loading audio files...");
     if (fileNames.length !== 16) {
       throw new Error("Expected 16 audio files.");
     }
@@ -64,7 +64,7 @@ export class AudioController {
   getFrequencyColor(track: number): string {
     const gainNode = this.tracks[track].gainNode;
     if (gainNode.gain.value === 0) {
-      return "orange";
+        return `hsl(${this.slowAverage + track}, 100%, 50%)`;
     }
     const analyserNode = this.tracks[track].analyserNode;
     const dataArray = new Uint8Array(analyserNode.frequencyBinCount);
@@ -73,13 +73,17 @@ export class AudioController {
     // get the highest frequency
     const max = Math.max(...dataArray);
     const maxIndex = dataArray.indexOf(max);
+    this.updateSlowAverage(maxIndex);
 
-    const hue = Math.min(maxIndex * 5, 240);
+    const hue = this.slowAverage + track + maxIndex * 5 % 240
     return `hsl(${hue}, 100%, 50%)`;
   }
 
+  updateSlowAverage(value: number) {
+    this.slowAverage = this.slowAverage + value * 0.001 % 240;
+  }
+
   unMuteTrack(trackNumber: number): void {
-    console.log("unMuteTrack", trackNumber);
     if (trackNumber == -1) {
       return;
     }
@@ -91,7 +95,6 @@ export class AudioController {
   }
 
   muteTrack(trackNumber: number): void {
-    console.log("muteTrack", trackNumber);
     if (trackNumber == -1) {
       return;
     }

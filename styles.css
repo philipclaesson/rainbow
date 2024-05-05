@@ -10,6 +10,7 @@ html {
     align-items: center;
     background-color: #f0f0f0;
     overflow: hidden;
+    background-color: #1c1c1b;
 }
 
 #matrix {
@@ -34,7 +35,7 @@ html {
     width: 50px;
     height: 50px;
     border-radius: 50%;
-    background-color: black;
+    background-color: white;
     position: absolute;
     cursor: pointer;
     /* Make sure positioning doesn't affect the flexbox */
@@ -47,4 +48,34 @@ html {
     display: flex;
     align-items: center;
     justify-content: space-evenly;
+}
+
+/* Keyframes for the spinner shown at load time */
+@-moz-keyframes spin {
+    100% {
+        -moz-transform: rotate(360deg);
+    }
+}
+
+@-webkit-keyframes spin {
+    100% {
+        -webkit-transform: rotate(360deg);
+    }
+}
+
+@keyframes spin {
+    100% {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
+
+.spinner {
+    width: 5vmin;
+    height: 5vmin;
+    /* border-radius: 50%; */
+    background-color: orange;
+    -webkit-animation: spin 4s linear infinite;
+    -moz-animation: spin 4s linear infinite;
+    animation: spin 4s linear infinite;
 }
