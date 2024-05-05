@@ -1,10 +1,31 @@
 import { AudioController } from "./audio";
 
 const ac = new AudioController();
+const nSquares = 16;
+const nBalls = 3;
 var isPlaying = false;
 var isInitiated = false;
 
-document.addEventListener("DOMContentLoaded", () => {
+function createUI() {
+  const matrix = document.createElement("div");
+  matrix.classList.add("matrix");
+  matrix.id = "matrix";
+  document.body.appendChild(matrix);
+  for (let i = 0; i < nSquares; i++) {
+    const square = document.createElement("div");
+    square.classList.add("square");
+    // square.id = `square-${i}`;
+    matrix.appendChild(square);
+  }
+  for (let i = 0; i < nBalls; i++) {
+    const ball = document.createElement("div");
+    ball.classList.add("ball");
+    ball.id = `ball-${i}`;
+    document.body.appendChild(ball);
+  }
+}
+
+function initUI() {
   const balls: NodeListOf<HTMLElement> = document.querySelectorAll(".ball");
   const squares: NodeListOf<HTMLElement> = document.querySelectorAll(".square");
   let activeBall: HTMLElement | null = null;
@@ -23,7 +44,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   balls.forEach((ball) => {
     ball.addEventListener("dragstart", (e: DragEvent) => {
-        initAudio();
       activeBall = ball;
       originSquare = ball.parentElement as HTMLElement;
       e.dataTransfer?.setData("text/plain", ball.id);
@@ -32,7 +52,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     ball.addEventListener("touchstart", (e: TouchEvent) => {
-        initAudio();
       activeBall = ball;
       originSquare = ball.parentElement as HTMLElement;
       console.log("Lifted:", ball.id, "from", originSquare.id);
@@ -80,7 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   });
-});
+}
 
 function idToInt(id: string): number {
   const parts = id.split("-");
@@ -115,3 +134,17 @@ async function initAudio() {
   ]);
   //   ac.unMuteTrack(0);
 }
+
+function createStartButton() {
+  const startButton = document.getElementById("start-button");
+  startButton?.addEventListener("click", () => {
+    startButton.remove();
+    createUI();
+    initUI();
+    initAudio();
+  });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  createStartButton();
+});
