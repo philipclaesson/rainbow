@@ -1,4 +1,10 @@
+import { AudioController } from "./audio";
+
+const ac = new AudioController();
+var isPlaying = false;
+
 document.addEventListener("DOMContentLoaded", () => {
+  setUpButtons();
   const balls: NodeListOf<HTMLElement> = document.querySelectorAll(".ball");
   const squares: NodeListOf<HTMLElement> = document.querySelectorAll(".square");
   let activeBall: HTMLElement | null = null;
@@ -6,12 +12,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const dropBall = (target: HTMLElement) => {
     if (activeBall && target.classList.contains("square")) {
+      console.log("Dropped:", activeBall.id, target.id);
+      ac.unMuteTrack(idToInt(target.id));
       target.appendChild(activeBall);
-    //   console.log(
-    //     `Placed: ${activeBall.id} from square ${
-    //       originSquare?.id || "unknown"
-    //     } to square ${target.id}`
-    //   );
       originSquare = null;
       activeBall.style.display = "block"; // Make sure to display the ball again
       activeBall = null;
@@ -24,6 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
       originSquare = ball.parentElement as HTMLElement;
       e.dataTransfer?.setData("text/plain", ball.id);
       console.log("Lifted:", ball.id, "from", originSquare.id);
+      ac.muteTrack(idToInt(originSquare.id));
     });
 
     ball.addEventListener("touchstart", (e: TouchEvent) => {
@@ -31,6 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
       originSquare = ball.parentElement as HTMLElement;
       console.log("Lifted:", ball.id, "from", originSquare.id);
       e.preventDefault();
+      ac.muteTrack(idToInt(originSquare.id));
     });
 
     ball.addEventListener("touchmove", (e: TouchEvent) => {
@@ -52,7 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
       ) as HTMLElement;
       activeBall.style.display = "block"; // Re-display the ball
       dropBall(targetElement);
-      console.log("Dropped:", ball.id, targetElement.id);
+      //   console.log("Dropped:", ball.id, targetElement.id);
     });
   });
 
@@ -74,3 +79,55 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 });
+
+function idToInt(id: string): number {
+  const parts = id.split("-");
+  if (parts.length < 2) {
+    return -1;
+  }
+  return parseInt(parts[1]);
+}
+
+function setUpButtons() {
+  const startButton = document.getElementById("start-button");
+  const c = document.getElementById("canvas");
+  if (!c) {
+    throw new Error("Canvas not found!");
+  }
+  c.style.display = "none";
+  startButton?.addEventListener("click", () => {
+    if (!isPlaying) {
+      initAudio();
+      isPlaying = true;
+      startButton.textContent = "Stop";
+      c.style.display = "block";
+    } else {
+      ac.muteAll();
+      isPlaying = false;
+      startButton.textContent = "Start";
+      c.style.display = "none";
+    }
+  });
+}
+
+async function initAudio() {
+  await ac.initAudio([
+    "stems/drums.wav",
+    "stems/hats.wav",
+    "stems/kick-hat.wav",
+    "stems/toms.wav",
+    "stems/acid-and-chord.wav",
+    "stems/bass.wav",
+    "stems/drums.wav",
+    "stems/hats.wav",
+    "stems/kick-hat.wav",
+    "stems/toms.wav",
+    "stems/acid-and-chord.wav",
+    "stems/bass.wav",
+    "stems/drums.wav",
+    "stems/hats.wav",
+    "stems/kick-hat.wav",
+    "stems/toms.wav",
+  ]);
+  //   ac.unMuteTrack(0);
+}
