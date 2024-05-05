@@ -29,6 +29,7 @@ function createUI() {
     ball.classList.add("ball");
     ball.id = `ball-${i}`;
     ball.draggable = true;
+    ball.innerText = `🌈`;
     ballHome.appendChild(ball);
   }
 }
@@ -189,8 +190,10 @@ function spinner(show: boolean) {
 
 function createStartButton() {
   const startButton = document.getElementById("start-button");
+  const info = document.getElementById("info");
   startButton?.addEventListener("click", async () => {
     startButton.remove();
+    info?.remove();
     spinner(true);
     await initAudio();
     spinner(false);
