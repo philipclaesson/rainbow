@@ -2,9 +2,9 @@ import { AudioController } from "./audio";
 
 const ac = new AudioController();
 var isPlaying = false;
+var isInitiated = false;
 
 document.addEventListener("DOMContentLoaded", () => {
-  setUpButtons();
   const balls: NodeListOf<HTMLElement> = document.querySelectorAll(".ball");
   const squares: NodeListOf<HTMLElement> = document.querySelectorAll(".square");
   let activeBall: HTMLElement | null = null;
@@ -23,6 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   balls.forEach((ball) => {
     ball.addEventListener("dragstart", (e: DragEvent) => {
+        initAudio();
       activeBall = ball;
       originSquare = ball.parentElement as HTMLElement;
       e.dataTransfer?.setData("text/plain", ball.id);
@@ -31,6 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     ball.addEventListener("touchstart", (e: TouchEvent) => {
+        initAudio();
       activeBall = ball;
       originSquare = ball.parentElement as HTMLElement;
       console.log("Lifted:", ball.id, "from", originSquare.id);
@@ -88,29 +90,11 @@ function idToInt(id: string): number {
   return parseInt(parts[1]);
 }
 
-function setUpButtons() {
-  const startButton = document.getElementById("start-button");
-  const c = document.getElementById("canvas");
-  if (!c) {
-    throw new Error("Canvas not found!");
-  }
-  c.style.display = "none";
-  startButton?.addEventListener("click", () => {
-    if (!isPlaying) {
-      initAudio();
-      isPlaying = true;
-      startButton.textContent = "Stop";
-      c.style.display = "block";
-    } else {
-      ac.muteAll();
-      isPlaying = false;
-      startButton.textContent = "Start";
-      c.style.display = "none";
-    }
-  });
-}
-
 async function initAudio() {
+  if (isInitiated) {
+    return;
+  }
+  isInitiated = true;
   await ac.initAudio([
     "stems/drums.wav",
     "stems/hats.wav",

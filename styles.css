@@ -1,18 +1,19 @@
 body,
 html {
-    height: 100%;
+    width: 100vw;
+    height: 100vh;
     margin: 0;
+    padding: 0;
     display: flex;
     justify-content: center;
     align-items: center;
     background-color: #f0f0f0;
+    overflow: hidden;
 }
 
 #canvas {
-    width: 100vw;
-    /* Full width of the viewport */
-    height: 100vh;
-    /* Full height of the viewport */
+    width: 100%;
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -24,18 +25,15 @@ html {
     grid-template-rows: repeat(4, 1fr);
     gap: 5px;
     width: 90vmin;
-    /* 90% of the smallest side of the viewport */
     height: 90vmin;
-    /* Same as width to maintain aspect ratio */
 }
 
 .square {
     background-color: #ddd;
-    /* border: 1px solid #ccc; */
     width: 100%;
-    /* Each square fills its cell */
+    /* Fill the cell */
     height: 100%;
-    /* Each square fills its cell */
+    /* Fill the cell */
 }
 
 .ball {
@@ -44,4 +42,5 @@ html {
     border-radius: 50%;
     background-color: blue;
     position: absolute;
+    /* Make sure positioning doesn't affect the flexbox */
 }
