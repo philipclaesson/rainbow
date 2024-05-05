@@ -8,18 +8,34 @@ html {
     background-color: #f0f0f0;
 }
 
+#canvas {
+    width: 100vw;
+    /* Full width of the viewport */
+    height: 100vh;
+    /* Full height of the viewport */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 #matrix {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     grid-template-rows: repeat(4, 1fr);
-    height: 80vh;
-    width: 80vh;
     gap: 5px;
+    width: 90vmin;
+    /* 90% of the smallest side of the viewport */
+    height: 90vmin;
+    /* Same as width to maintain aspect ratio */
 }
 
 .square {
     background-color: #ddd;
-    border: 1px solid #ccc;
+    /* border: 1px solid #ccc; */
+    width: 100%;
+    /* Each square fills its cell */
+    height: 100%;
+    /* Each square fills its cell */
 }
 
 .ball {
