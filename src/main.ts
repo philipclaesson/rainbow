@@ -43,76 +43,64 @@ function initUILogic() {
   };
 
   balls.forEach((ball) => {
-    // Desktop click events
-    ball.addEventListener("mousedown", (e: MouseEvent) => {
-      mobileUsage = false; // Assuming you use this to distinguish between mobile and desktop usage
+    // Helper to extract position from event
+    function getPositionFromEvent(e: MouseEvent | TouchEvent): {
+      x: number;
+      y: number;
+    } {
+      if (e instanceof TouchEvent && e.touches) {
+        return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      } else if (e instanceof MouseEvent) {
+        return { x: e.clientX, y: e.clientY };
+      } else {
+        throw new Error("Unsupported event type");
+      }
+    }
+
+    // Common function for starting the drag
+    function startDrag(e: MouseEvent | TouchEvent) {
       const originSquare = ball.parentElement as HTMLElement;
       ball.setAttribute("origin-square", originSquare.id);
-      ball.setAttribute("clicked", "true")
-      console.log("[Mousedown] Picked up", ball.id, "from", originSquare.id);
-      e.preventDefault(); // This prevents the default text selection behavior
-    });
-
-    ball.addEventListener("mousemove", (e: MouseEvent) => {
-      if (ball.getAttribute("clicked") !== "true") return;
-      console.log("[Mousemove] Moving", ball.id);
+      ball.setAttribute("clicked", "true");
+      mobileUsage = e.type === "touchstart";
+      console.log(`[${e.type}] Lifted`, ball.id, "from", originSquare.id);
       e.preventDefault();
-      ball.style.left = `${e.clientX - 25}px`; // Adjust for center of the ball
-      ball.style.top = `${e.clientY - 25}px`;
-    });
+    }
 
-    ball.addEventListener("mouseup", (e: MouseEvent) => {
+    // Common function for dragging
+    function doDrag(e: MouseEvent | TouchEvent) {
       if (ball.getAttribute("clicked") !== "true") return;
+      const position = getPositionFromEvent(e);
+      ball.style.left = `${position.x - 25}px`;
+      ball.style.top = `${position.y - 25}px`;
+      // console.log(`[${e.type}] Moving/Dragging`, ball.id);
+      e.preventDefault();
+    }
+
+    // Common function for ending the drag
+    function endDrag(e: MouseEvent | TouchEvent) {
+      if (ball.getAttribute("clicked") !== "true") return;
+      const position = getPositionFromEvent(e);
       const originSquareId = ball.getAttribute("origin-square");
       ac.enableTrack(getSquareId(originSquareId), false);
       ball.setAttribute("clicked", "false");
       showBalls(false);
       const targetElement = document.elementFromPoint(
-        e.clientX,
-        e.clientY
+        position.x,
+        position.y
       ) as HTMLElement;
       showBalls(true);
-
       dropBall(ball, targetElement);
-      console.log("[Mouseup] Dropped", ball.id, "from", originSquareId);
-    });
+      console.log(`[${e.type}] Dropped`, ball.id, "from", originSquareId);
+    }
 
-    // Mobile touch events
-    ball.addEventListener("touchstart", (e: TouchEvent) => {
-      mobileUsage = true;
-      const originSquare = ball.parentElement as HTMLElement;
-      ball.setAttribute("origin-square", originSquare.id);
-      console.log("[Touchstart] Lifted", ball.id, "from", originSquare.id);
-    });
-
-    ball.addEventListener("touchmove", (e: TouchEvent) => {
-      console.log("[Touchmove] Dragging", ball.id, e.touches.length);
-      e.preventDefault();
-      mobileUsage = true;
-      if (e.touches.length === 1) {
-        const touch = e.touches[0];
-        ball.style.left = `${touch.clientX - 25}px`; // Adjust for center of the ball
-        ball.style.top = `${touch.clientY - 25}px`;
-      }
-    });
-
-    ball.addEventListener("touchend", (e: TouchEvent) => {
-      // Mute the square that the ball came from
-      const originSquareId = ball.getAttribute("origin-square");
-      ac.enableTrack(getSquareId(originSquareId), false);
-
-      // hide balls while we find the target element
-      showBalls(false);
-      const touch = e.changedTouches[0];
-      const targetElement = document.elementFromPoint(
-        touch.clientX,
-        touch.clientY
-      ) as HTMLElement;
-      showBalls(true);
-
-      dropBall(ball, targetElement);
-      console.log("[Touchend] Dropped", ball.id);
-    });
+    // Add event listeners
+    ball.addEventListener("mousedown", startDrag);
+    ball.addEventListener("mousemove", doDrag);
+    ball.addEventListener("mouseup", endDrag);
+    ball.addEventListener("touchstart", startDrag);
+    ball.addEventListener("touchmove", doDrag);
+    ball.addEventListener("touchend", endDrag);
   });
 }
 
