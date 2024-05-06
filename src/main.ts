@@ -53,18 +53,24 @@ function initUILogic() {
   balls.forEach((ball) => {
     ball.addEventListener("dragstart", (e: DragEvent) => {
       activeBall = ball;
-      originSquare = ball.parentElement as HTMLElement;
-      e.dataTransfer?.setData("text/plain", ball.id);
+      const originSquare = ball.parentElement as HTMLElement;
+      ball.setAttribute("origin-square", originSquare.id);
       console.log("[Dragstart]: Lifted", ball.id, "from", originSquare.id);
-      ac.enableTrack(getSquareId(originSquare.id), false);
+    });
+
+    ball.addEventListener("dragend", (e: DragEvent) => {
+      // Mute the square that the ball came from
+      const originSquareId = ball.getAttribute("origin-square");
+      ac.enableTrack(getSquareId(originSquareId), false);
+      console.log("[Dragend]: Dropped", ball.id, "from", originSquareId);
     });
 
     ball.addEventListener("touchstart", (e: TouchEvent) => {
       mobileUsage = true;
       activeBall = ball;
-      originSquare = ball.parentElement as HTMLElement;
+      const originSquare = ball.parentElement as HTMLElement;
+      ball.setAttribute("origin-square", originSquare.id);
       console.log("[Touchstart] Lifted", ball.id, "from", originSquare.id);
-      ac.enableTrack(getSquareId(originSquare.id), false);
     });
 
     ball.addEventListener("touchmove", (e: TouchEvent) => {
@@ -79,8 +85,11 @@ function initUILogic() {
     });
 
     ball.addEventListener("touchend", (e: TouchEvent) => {
-      console.log("[Touchend] Dropped", ball.id);
-      if (!activeBall) return;
+      // Mute the square that the ball came from
+      const originSquareId = ball.getAttribute("origin-square");
+      ac.enableTrack(getSquareId(originSquareId), false);
+
+      // hide balls while we find the target element
       showBalls(false);
       const touch = e.changedTouches[0];
       const targetElement = document.elementFromPoint(
@@ -88,7 +97,9 @@ function initUILogic() {
         touch.clientY
       ) as HTMLElement;
       showBalls(true);
+
       dropBall(targetElement);
+      console.log("[Touchend] Dropped", ball.id);
     });
   });
 
