@@ -1,3 +1,3 @@
 ## squares
-- [ ] balls should not start in the middle of the thing
-- [ ] should be able to put balls anywhere in desktop
+- [ ] moving fast looses the ball
+- [ ] dropping two balls in the same square works unexpectedly
