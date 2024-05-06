@@ -48,8 +48,9 @@ function initUILogic() {
       x: number;
       y: number;
     } {
-      if (e instanceof TouchEvent && e.touches) {
-        return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      if (e instanceof TouchEvent && (e.touches || e.changedTouches)) {
+        const touches = e.touches.length > 0 ? e.touches : e.changedTouches
+        return { x: touches[0].clientX, y: touches[0].clientY };
       } else if (e instanceof MouseEvent) {
         return { x: e.clientX, y: e.clientY };
       } else {
@@ -59,22 +60,22 @@ function initUILogic() {
 
     // Common function for starting the drag
     function startDrag(e: MouseEvent | TouchEvent) {
+      e.preventDefault();
       const originSquare = ball.parentElement as HTMLElement;
       ball.setAttribute("origin-square", originSquare.id);
       ball.setAttribute("clicked", "true");
       mobileUsage = e.type === "touchstart";
       console.log(`[${e.type}] Lifted`, ball.id, "from", originSquare.id);
-      e.preventDefault();
     }
 
     // Common function for dragging
     function doDrag(e: MouseEvent | TouchEvent) {
+      e.preventDefault();
       if (ball.getAttribute("clicked") !== "true") return;
       const position = getPositionFromEvent(e);
       ball.style.left = `${position.x - 25}px`;
       ball.style.top = `${position.y - 25}px`;
       // console.log(`[${e.type}] Moving/Dragging`, ball.id);
-      e.preventDefault();
     }
 
     // Common function for ending the drag
