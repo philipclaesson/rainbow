@@ -39,7 +39,7 @@ export class AudioController {
 
       // set up fx nodes
       this.fx1a = this.audioContext.createBiquadFilter();
-      this.fx1a.type = "lowshelf";
+      this.fx1a.type = "highpass";
       this.fx1a.frequency.value = 1000;
       this.fx1a.gain.value = 0;
       gainNode.connect(this.fx1a);
@@ -127,9 +127,8 @@ export class AudioController {
     console.log("Current time:", this.audioContext.currentTime);
 
     console.log("Applying gain:", x * 25, "to fx1a");
-    this.fx1a.gain.setValueAtTime(x * 25, this.audioContext.currentTime);
-
-    console.log("Applying delay:", y, "to fx1b");
+    const gain = Math.floor(x * 10);
+    this.fx1a.gain.setValueAtTime(gain, this.audioContext.currentTime);
     this.fx1b.delayTime.setValueAtTime(y, this.audioContext.currentTime);
 
     console.log(this.fx1a, this.fx1b);
