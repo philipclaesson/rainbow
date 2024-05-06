@@ -2,13 +2,34 @@ import { AudioController } from "./audio";
 
 const ac = new AudioController();
 const nSquares = 16;
-const nBalls = 3;
+const nBalls = 4;
 var isPlaying = false;
 var isInitiated = false;
 var mobileUsage = false;
 var ballHome: HTMLElement | null = null;
+var fxEnable = false;
 
 function createUI() {
+  const fxdiv = document.createElement("div");
+  fxdiv.classList.add("fx");
+  fxdiv.id = "fx";
+  document.body.appendChild(fxdiv);
+  fxdiv.style.display = fxEnable ? "block" : "none";
+  const fx1 = document.createElement("div");
+  fx1.classList.add("fx1");
+  fx1.id = "fx1";
+  fx1.innerText = "🌊";
+  fxdiv.appendChild(fx1);
+  const fxspacer = document.createElement("div");
+  fxspacer.classList.add("fxspacer");
+  fxspacer.id = "fxspacer";
+  fxdiv.appendChild(fxspacer);
+  const fx2 = document.createElement("div");
+  fx2.classList.add("fx2");
+  fx2.id = "fx2";
+  fx2.innerText = "🕥";
+  fxdiv.appendChild(fx2);
+
   const matrix = document.createElement("div");
   matrix.classList.add("matrix");
   matrix.id = "matrix";
@@ -130,6 +151,68 @@ function initUI() {
       dropBall(ballHome);
     }
   });
+
+  // init fx
+  const fx1 = document.getElementById("fx1");
+  if (!fx1) {
+    throw new Error("fx1 not found");
+  }
+  fx1.draggable = true;
+  const fx2 = document.getElementById("fx2");
+  fx1?.addEventListener("dragstart", (e: DragEvent) => {
+    const {x, y} = normalizedXY(e.x, e.y)
+    ac.fx1(x, y);
+    console.log("dragstart");
+  });
+  fx1?.addEventListener("drag", (e: DragEvent) => {
+    const {x, y} = normalizedXY(e.x, e.y)
+    ac.fx1(x, y);
+    console.log("dragmove");
+  });
+  fx1?.addEventListener("dragend", (e: DragEvent) => {
+    ac.fx1(0, 0);
+    console.log("dragend");
+  });
+  fx1?.addEventListener("touchstart", (e: TouchEvent) => {
+    if (e.touches.length != 1) {
+      return;
+    }
+    const touch = e.touches[0];
+    const {x, y} = normalizedXY(touch.clientX, touch.clientY)
+    ac.fx1(x, y)
+    console.log("touchstart");
+  });
+  fx1?.addEventListener("touchmove", (e: TouchEvent) => {
+    if (e.touches.length != 1) {
+      return;
+    }
+    const touch = e.touches[0];
+    const {x, y} = normalizedXY(touch.clientX, touch.clientY)
+    ac.fx1(x, y)
+    console.log("touchmove");
+  });
+  fx1?.addEventListener("touchend", (e: TouchEvent) => {
+    if (e.touches.length != 1) {
+      return;
+    }
+    ac.fx1(0, 0);
+    console.log("touchend");
+  });
+  // doesnt work, we would need listeners across the whole screen
+  // fx1?.addEventListener("click", () => {
+  //     // Handle click event for fx1
+  //     console.log("click");
+  // });
+
+  // fx1?.addEventListener("mousedown", () => {
+  //     // Handle mouse down event for fx1
+  //     console.log("mousedown");
+  // });
+
+  // fx1?.addEventListener("mouseup", () => {
+  //     // Handle mouse up event for fx1
+  //     console.log("mouseup");
+  // });
 }
 
 function showBalls(show: boolean) {
@@ -148,6 +231,12 @@ function getSquareId(id: string | null): number {
     return -1;
   }
   return parseInt(parts[1]);
+}
+
+function normalizedXY(x: number, y: number) {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    return {x: x / width, y: y / height}
 }
 
 async function initAudio() {

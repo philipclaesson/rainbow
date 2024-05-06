@@ -6,6 +6,8 @@ export class AudioController {
     analyserNode: AnalyserNode;
   }[] = [];
   private slowAverage: number = 39; // orange
+  private fx1a: BiquadFilterNode | null = null;
+  private fx1b: DelayNode | null = null;
 
   constructor() {
     this.audioContext = new AudioContext();
@@ -28,14 +30,25 @@ export class AudioController {
 
       sourceNode.buffer = buffer;
       gainNode.gain.value = 0; // Start muted
+      sourceNode.connect(gainNode);
 
       // set up an analyser so we can do cool visuals
       const analyserNode = this.audioContext.createAnalyser();
       analyserNode.fftSize = 2048;
       gainNode.connect(analyserNode);
 
-      sourceNode.connect(gainNode);
-      gainNode.connect(this.audioContext.destination);
+      // set up fx nodes
+      this.fx1a = this.audioContext.createBiquadFilter();
+      this.fx1a.type = "lowshelf";
+      this.fx1a.frequency.value = 1000;
+      this.fx1a.gain.value = 0;
+      gainNode.connect(this.fx1a);
+
+      this.fx1b = this.audioContext.createDelay();
+      this.fx1b.delayTime.value = 0; // pass through
+      this.fx1a.connect(this.fx1b);
+
+      this.fx1b.connect(this.audioContext.destination);
 
       this.tracks.push({ sourceNode, gainNode, analyserNode });
 
@@ -50,21 +63,10 @@ export class AudioController {
     return this.audioContext.decodeAudioData(arrayBuffer);
   }
 
-  getNoiseColor(track: number): string {
-    const analyserNode = this.tracks[track].analyserNode;
-    const dataArray = new Uint8Array(analyserNode.frequencyBinCount);
-    analyserNode.getByteFrequencyData(dataArray);
-
-    const average =
-      dataArray.reduce((acc, val) => acc + val, 0) / dataArray.length;
-    const hue = Math.min(100 + average * 5, 240);
-    return `hsl(${hue}, 100%, 50%)`;
-  }
-
   getFrequencyColor(track: number): string {
     const gainNode = this.tracks[track].gainNode;
     if (gainNode.gain.value === 0) {
-        return `hsl(${this.slowAverage + track}, 100%, 50%)`;
+      return `hsl(${this.slowAverage + track}, 100%, 50%)`;
     }
     const analyserNode = this.tracks[track].analyserNode;
     const dataArray = new Uint8Array(analyserNode.frequencyBinCount);
@@ -80,7 +82,7 @@ export class AudioController {
   }
 
   updateSlowAverage(value: number) {
-    this.slowAverage = this.slowAverage + value * 0.001 % 240;
+    this.slowAverage = this.slowAverage + ((value * 0.001) % 240);
   }
 
   unMuteTrack(trackNumber: number): void {
@@ -109,5 +111,27 @@ export class AudioController {
     for (let i = 0; i < this.tracks.length; i++) {
       this.muteTrack(i);
     }
+  }
+
+  fx1(x: number, y: number) {
+    if (x != 0 && y != 0) {
+      if (Math.random() > 0.1) {
+        return;
+      }
+    }
+    if (!this.fx1a || !this.fx1b) {
+      return;
+    }
+    console.log("fx1 called with x:", x, "y:", y);
+    console.log("AudioContext state:", this.audioContext.state);
+    console.log("Current time:", this.audioContext.currentTime);
+
+    console.log("Applying gain:", x * 25, "to fx1a");
+    this.fx1a.gain.setValueAtTime(x * 25, this.audioContext.currentTime);
+
+    console.log("Applying delay:", y, "to fx1b");
+    this.fx1b.delayTime.setValueAtTime(y, this.audioContext.currentTime);
+
+    console.log(this.fx1a, this.fx1b);
   }
 }

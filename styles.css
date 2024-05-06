@@ -74,6 +74,17 @@ button:hover {
     justify-content: space-evenly;
 }
 
+.fx {
+    font-size: 50px;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10vh;
+}
+
+.fxspacer {
+    width: 60vmin;
+}
+
 /* Keyframes for the spinner shown at load time */
 @-moz-keyframes spin {
     100% {
