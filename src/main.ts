@@ -163,14 +163,14 @@ async function initAudio() {
     "stems/kick-hat.wav",
     "stems/smooth-chords.wav",
     "stems/toms.wav",
-    "stems/4-on-floor.wav",
+    "stems/guitar.wav",
     "stems/bass.wav",
     "stems/dnb-124.wav",
     "stems/drums.wav",
     "stems/hats.wav",
     "stems/kick-hat.wav",
     "stems/smooth-chords.wav",
-    "stems/toms.wav",
+    "stems/extacy.wav",
   ]);
   isInitiated = true;
 }
