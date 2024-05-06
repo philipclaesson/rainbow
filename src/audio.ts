@@ -87,31 +87,20 @@ export class AudioController {
     this.slowAverage = this.slowAverage + ((value * 0.001) % 240);
   }
 
-  unMuteTrack(trackNumber: number): void {
+  enableTrack(trackNumber: number, enable: boolean): void {
     if (trackNumber == -1) {
       return;
     }
-    if (this.tracks[trackNumber]) {
-      this.tracks[trackNumber].gainNode.gain.value = 0.5;
-    } else {
+    if (trackNumber >= this.tracks.length) {
       throw new Error(`Track ${trackNumber} does not exist.`);
     }
-  }
-
-  muteTrack(trackNumber: number): void {
-    if (trackNumber == -1) {
-      return;
-    }
-    if (this.tracks[trackNumber]) {
-      this.tracks[trackNumber].gainNode.gain.value = 0;
-    } else {
-      throw new Error(`Track ${trackNumber} does not exist.`);
-    }
+    console.log("Enabling track", trackNumber, enable)
+    this.tracks[trackNumber].gainNode.gain.value = enable ? 0.5 : 0;
   }
 
   muteAll(): void {
     for (let i = 0; i < this.tracks.length; i++) {
-      this.muteTrack(i);
+      this.enableTrack(i, false);
     }
   }
 

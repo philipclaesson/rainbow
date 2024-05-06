@@ -42,7 +42,7 @@ function initUILogic() {
   const dropBall = (target: HTMLElement) => {
     if (activeBall) {
       console.log("Dropped:", activeBall.id, target.id);
-      ac.unMuteTrack(getSquareId(target.id));
+      ac.enableTrack(getSquareId(target.id), true);
       target.appendChild(activeBall);
       originSquare = null;
       activeBall.style.display = "block"; // Make sure to display the ball again
@@ -56,7 +56,7 @@ function initUILogic() {
       originSquare = ball.parentElement as HTMLElement;
       e.dataTransfer?.setData("text/plain", ball.id);
       console.log("[Dragstart]: Lifted", ball.id, "from", originSquare.id);
-      ac.muteTrack(getSquareId(originSquare.id));
+      ac.enableTrack(getSquareId(originSquare.id), false);
     });
 
     ball.addEventListener("touchstart", (e: TouchEvent) => {
@@ -64,7 +64,7 @@ function initUILogic() {
       activeBall = ball;
       originSquare = ball.parentElement as HTMLElement;
       console.log("[Touchstart] Lifted", ball.id, "from", originSquare.id);
-      ac.muteTrack(getSquareId(originSquare.id));
+      ac.enableTrack(getSquareId(originSquare.id), false);
     });
 
     ball.addEventListener("touchmove", (e: TouchEvent) => {

@@ -9,8 +9,7 @@ export declare class AudioController {
     private loadAudioFile;
     getFrequencyColor(track: number): string;
     updateSlowAverage(value: number): void;
-    unMuteTrack(trackNumber: number): void;
-    muteTrack(trackNumber: number): void;
+    enableTrack(trackNumber: number, enable: boolean): void;
     muteAll(): void;
     fx1(x: number, y: number): void;
 }
