@@ -3,59 +3,37 @@ import { AudioController } from "./audio";
 const ac = new AudioController();
 const nSquares = 16;
 const nBalls = 4;
-var isPlaying = false;
 var isInitiated = false;
 var mobileUsage = false;
 var ballHome: HTMLElement | null = null;
 var fxEnable = false;
 
-function createUI() {
-  const fxdiv = document.createElement("div");
-  fxdiv.classList.add("fx");
-  fxdiv.id = "fx";
-  document.body.appendChild(fxdiv);
-  fxdiv.style.display = fxEnable ? "block" : "none";
-  const fx1 = document.createElement("div");
-  fx1.classList.add("fx1");
-  fx1.id = "fx1";
-  fx1.innerText = "🌊";
-  fxdiv.appendChild(fx1);
-  const fxspacer = document.createElement("div");
-  fxspacer.classList.add("fxspacer");
-  fxspacer.id = "fxspacer";
-  fxdiv.appendChild(fxspacer);
-  const fx2 = document.createElement("div");
-  fx2.classList.add("fx2");
-  fx2.id = "fx2";
-  fx2.innerText = "🕥";
-  fxdiv.appendChild(fx2);
-
-  const matrix = document.createElement("div");
-  matrix.classList.add("matrix");
-  matrix.id = "matrix";
-  document.body.appendChild(matrix);
-  for (let i = 0; i < nSquares; i++) {
-    const square = document.createElement("div");
-    square.classList.add("square");
-    square.id = `square-${i}`;
-    matrix.appendChild(square);
+function createUIElements() {
+  // Create FX ui
+  if (fxEnable) {
+    const fxdiv = createElement("div", "fx", "fx", document.body);
+    fxdiv.style.display = fxEnable ? "block" : "none";
+    const fx1 = createElement("div", "fx1", "fx1", fxdiv);
+    fx1.innerText = "🌊";
+    const fxspacer = createElement("div", "fxspacer", "fxspacer", fxdiv);
+    const fx2 = createElement("div", "fx2", "fx2", fxdiv);
+    fx2.innerText = "🕥";
   }
-  ballHome = document.createElement("div");
-  ballHome.classList.add("ballhome");
-  ballHome.id = "ballhome";
-  document.body.appendChild(ballHome);
+
+  const matrix = createElement("div", "matrix", "matrix", document.body);
+  for (let i = 0; i < nSquares; i++) {
+    createElement("div", "square", `square-${i}`, matrix);
+  }
+  ballHome = createElement("div", "ballhome", "ballhome", document.body);
 
   for (let i = 0; i < nBalls; i++) {
-    const ball = document.createElement("div");
-    ball.classList.add("ball");
-    ball.id = `ball-${i}`;
+    const ball = createElement("div", "ball", `ball-${i}`, ballHome);
     ball.draggable = true;
     ball.innerText = `🌈`;
-    ballHome.appendChild(ball);
   }
 }
 
-function initUI() {
+function initUILogic() {
   const balls: NodeListOf<HTMLElement> = document.querySelectorAll(".ball");
   const squares: NodeListOf<HTMLElement> = document.querySelectorAll(".square");
   let activeBall: HTMLElement | null = null;
@@ -151,8 +129,12 @@ function initUI() {
       dropBall(ballHome);
     }
   });
+}
 
-  // init fx
+function initFXUI() {
+  if (!fxEnable) {
+    return;
+  }
   const fx1 = document.getElementById("fx1");
   if (!fx1) {
     throw new Error("fx1 not found");
@@ -160,12 +142,12 @@ function initUI() {
   fx1.draggable = true;
   const fx2 = document.getElementById("fx2");
   fx1?.addEventListener("dragstart", (e: DragEvent) => {
-    const {x, y} = normalizedXY(e.x, e.y)
+    const { x, y } = normalizedXY(e.x, e.y);
     ac.fx1(x, y);
     console.log("dragstart");
   });
   fx1?.addEventListener("drag", (e: DragEvent) => {
-    const {x, y} = normalizedXY(e.x, e.y)
+    const { x, y } = normalizedXY(e.x, e.y);
     ac.fx1(x, y);
     console.log("dragmove");
   });
@@ -178,8 +160,8 @@ function initUI() {
       return;
     }
     const touch = e.touches[0];
-    const {x, y} = normalizedXY(touch.clientX, touch.clientY)
-    ac.fx1(x, y)
+    const { x, y } = normalizedXY(touch.clientX, touch.clientY);
+    ac.fx1(x, y);
     console.log("touchstart");
   });
   fx1?.addEventListener("touchmove", (e: TouchEvent) => {
@@ -187,8 +169,8 @@ function initUI() {
       return;
     }
     const touch = e.touches[0];
-    const {x, y} = normalizedXY(touch.clientX, touch.clientY)
-    ac.fx1(x, y)
+    const { x, y } = normalizedXY(touch.clientX, touch.clientY);
+    ac.fx1(x, y);
     console.log("touchmove");
   });
   fx1?.addEventListener("touchend", (e: TouchEvent) => {
@@ -198,21 +180,19 @@ function initUI() {
     ac.fx1(0, 0);
     console.log("touchend");
   });
-  // doesnt work, we would need listeners across the whole screen
-  // fx1?.addEventListener("click", () => {
-  //     // Handle click event for fx1
-  //     console.log("click");
-  // });
+}
 
-  // fx1?.addEventListener("mousedown", () => {
-  //     // Handle mouse down event for fx1
-  //     console.log("mousedown");
-  // });
-
-  // fx1?.addEventListener("mouseup", () => {
-  //     // Handle mouse up event for fx1
-  //     console.log("mouseup");
-  // });
+function createElement(
+  tag: string,
+  cls: string,
+  id: string,
+  parent: HTMLElement
+) {
+  const element = document.createElement(tag);
+  element.classList.add(cls);
+  element.id = id;
+  parent.appendChild(element);
+  return element;
 }
 
 function showBalls(show: boolean) {
@@ -234,9 +214,9 @@ function getSquareId(id: string | null): number {
 }
 
 function normalizedXY(x: number, y: number) {
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-    return {x: x / width, y: y / height}
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+  return { x: x / width, y: y / height };
 }
 
 async function initAudio() {
@@ -266,11 +246,7 @@ async function initAudio() {
 
 function spinner(show: boolean) {
   if (show) {
-    const spinner = document.createElement("div");
-
-    spinner.classList.add("spinner");
-    spinner.id = "spinner";
-    document.body.appendChild(spinner);
+    createElement("div", "spinner", "spinner", document.body);
   } else {
     const spinner = document.getElementById("spinner");
     spinner?.remove();
@@ -286,8 +262,9 @@ function createStartButton() {
     spinner(true);
     await initAudio();
     spinner(false);
-    createUI();
-    initUI();
+    createUIElements();
+    initUILogic();
+    initFXUI();
     draw();
   });
 }

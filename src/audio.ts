@@ -48,7 +48,9 @@ export class AudioController {
       this.fx1b.delayTime.value = 0; // pass through
       this.fx1a.connect(this.fx1b);
 
-      this.fx1b.connect(this.audioContext.destination);
+      // for now just bypass the FX nodes - not implemented properly yet
+      //   this.fx1b.connect(this.audioContext.destination);
+      gainNode.connect(this.audioContext.destination);
 
       this.tracks.push({ sourceNode, gainNode, analyserNode });
 
