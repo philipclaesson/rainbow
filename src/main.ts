@@ -155,21 +155,21 @@ async function initAudio() {
     return;
   }
   await ac.initAudio([
-    "stems/drums.wav",
-    "stems/hats.wav",
-    "stems/kick-hat.wav",
-    "stems/toms.wav",
-    "stems/acid-and-chord.wav",
+    "stems/4-on-floor.wav",
     "stems/bass.wav",
+    "stems/dnb-124.wav",
     "stems/drums.wav",
     "stems/hats.wav",
     "stems/kick-hat.wav",
+    "stems/smooth-chords.wav",
     "stems/toms.wav",
-    "stems/acid-and-chord.wav",
+    "stems/4-on-floor.wav",
     "stems/bass.wav",
+    "stems/dnb-124.wav",
     "stems/drums.wav",
     "stems/hats.wav",
     "stems/kick-hat.wav",
+    "stems/smooth-chords.wav",
     "stems/toms.wav",
   ]);
   isInitiated = true;

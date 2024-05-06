@@ -75,7 +75,7 @@ export class AudioController {
     const maxIndex = dataArray.indexOf(max);
     this.updateSlowAverage(maxIndex);
 
-    const hue = this.slowAverage + track + maxIndex * 5 % 240
+    const hue = this.slowAverage + track + ((maxIndex * 10) % 240);
     return `hsl(${hue}, 100%, 50%)`;
   }
 
@@ -88,7 +88,7 @@ export class AudioController {
       return;
     }
     if (this.tracks[trackNumber]) {
-      this.tracks[trackNumber].gainNode.gain.value = 1; // Set gain to 1 to unmute
+      this.tracks[trackNumber].gainNode.gain.value = 0.5;
     } else {
       throw new Error(`Track ${trackNumber} does not exist.`);
     }
@@ -99,7 +99,7 @@ export class AudioController {
       return;
     }
     if (this.tracks[trackNumber]) {
-      this.tracks[trackNumber].gainNode.gain.value = 0; // Set gain to 0 to mute
+      this.tracks[trackNumber].gainNode.gain.value = 0;
     } else {
       throw new Error(`Track ${trackNumber} does not exist.`);
     }
