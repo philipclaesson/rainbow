@@ -40,7 +40,6 @@ function initUILogic() {
     console.log("Dropped:", ball.id, target.id);
     ac.enableTrack(getSquareId(target.id), true);
     target.appendChild(ball);
-    // ball.style.display = "block"; // Make sure to display the ball again
   };
 
   balls.forEach((ball) => {
