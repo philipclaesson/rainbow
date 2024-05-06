@@ -5,7 +5,6 @@ const nSquares = 16;
 const nBalls = 4;
 var isInitiated = false;
 var mobileUsage = false;
-var ballHome: HTMLElement | null = null;
 var fxEnable = false;
 
 function createUIElements() {
@@ -24,8 +23,8 @@ function createUIElements() {
   for (let i = 0; i < nSquares; i++) {
     createElement("div", "square", `square-${i}`, matrix);
   }
-  ballHome = createElement("div", "ballhome", "ballhome", document.body);
 
+  const ballHome = createElement("div", "ballhome", "ballhome", document.body);
   for (let i = 0; i < nBalls; i++) {
     const ball = createElement("div", "ball", `ball-${i}`, ballHome);
     ball.draggable = true;
@@ -35,39 +34,53 @@ function createUIElements() {
 
 function initUILogic() {
   const balls: NodeListOf<HTMLElement> = document.querySelectorAll(".ball");
-  const squares: NodeListOf<HTMLElement> = document.querySelectorAll(".square");
-  let activeBall: HTMLElement | null = null;
-  let originSquare: HTMLElement | null = null;
 
-  const dropBall = (target: HTMLElement) => {
-    if (activeBall) {
-      console.log("Dropped:", activeBall.id, target.id);
-      ac.enableTrack(getSquareId(target.id), true);
-      target.appendChild(activeBall);
-      originSquare = null;
-      activeBall.style.display = "block"; // Make sure to display the ball again
-      activeBall = null;
-    }
+  // Drops a ball into a target element and mutes the track the ball came from
+  const dropBall = (ball: HTMLElement, target: HTMLElement) => {
+    console.log("Dropped:", ball.id, target.id);
+    ac.enableTrack(getSquareId(target.id), true);
+    target.appendChild(ball);
+    // ball.style.display = "block"; // Make sure to display the ball again
   };
 
   balls.forEach((ball) => {
-    ball.addEventListener("dragstart", (e: DragEvent) => {
-      activeBall = ball;
+    // Desktop click events
+    ball.addEventListener("mousedown", (e: MouseEvent) => {
+      mobileUsage = false; // Assuming you use this to distinguish between mobile and desktop usage
       const originSquare = ball.parentElement as HTMLElement;
       ball.setAttribute("origin-square", originSquare.id);
-      console.log("[Dragstart]: Lifted", ball.id, "from", originSquare.id);
+      ball.setAttribute("clicked", "true")
+      console.log("[Mousedown] Picked up", ball.id, "from", originSquare.id);
+      e.preventDefault(); // This prevents the default text selection behavior
     });
 
-    ball.addEventListener("dragend", (e: DragEvent) => {
-      // Mute the square that the ball came from
+    ball.addEventListener("mousemove", (e: MouseEvent) => {
+      if (ball.getAttribute("clicked") !== "true") return;
+      console.log("[Mousemove] Moving", ball.id);
+      e.preventDefault();
+      ball.style.left = `${e.clientX - 25}px`; // Adjust for center of the ball
+      ball.style.top = `${e.clientY - 25}px`;
+    });
+
+    ball.addEventListener("mouseup", (e: MouseEvent) => {
+      if (ball.getAttribute("clicked") !== "true") return;
       const originSquareId = ball.getAttribute("origin-square");
       ac.enableTrack(getSquareId(originSquareId), false);
-      console.log("[Dragend]: Dropped", ball.id, "from", originSquareId);
+      ball.setAttribute("clicked", "false");
+      showBalls(false);
+      const targetElement = document.elementFromPoint(
+        e.clientX,
+        e.clientY
+      ) as HTMLElement;
+      showBalls(true);
+
+      dropBall(ball, targetElement);
+      console.log("[Mouseup] Dropped", ball.id, "from", originSquareId);
     });
 
+    // Mobile touch events
     ball.addEventListener("touchstart", (e: TouchEvent) => {
       mobileUsage = true;
-      activeBall = ball;
       const originSquare = ball.parentElement as HTMLElement;
       ball.setAttribute("origin-square", originSquare.id);
       console.log("[Touchstart] Lifted", ball.id, "from", originSquare.id);
@@ -98,47 +111,9 @@ function initUILogic() {
       ) as HTMLElement;
       showBalls(true);
 
-      dropBall(targetElement);
+      dropBall(ball, targetElement);
       console.log("[Touchend] Dropped", ball.id);
     });
-  });
-
-  squares.forEach((square) => {
-    square.addEventListener("dragover", (e: DragEvent) => {
-      e.preventDefault();
-    });
-
-    square.addEventListener("drop", (e: DragEvent) => {
-      e.preventDefault();
-      dropBall(square);
-    });
-  });
-
-  if (!ballHome) {
-    throw new Error("Ball home not found");
-  }
-  ballHome.addEventListener("dragover", (e: DragEvent) => {
-    e.preventDefault();
-  });
-
-  ballHome.addEventListener("drop", (e: DragEvent) => {
-    e.preventDefault();
-    if (!ballHome) {
-      throw new Error("Ball home not found");
-    }
-    dropBall(ballHome);
-  });
-
-  document.addEventListener("dragover", (e) => {
-    if (!mobileUsage) {
-      e.preventDefault(); // This allows the drop to be accepted.
-    }
-  });
-  document.addEventListener("drop", (e) => {
-    if (!mobileUsage) {
-      const ballHome = document.getElementById("ballhome") as HTMLElement;
-      dropBall(ballHome);
-    }
   });
 }
 
