@@ -4,7 +4,6 @@ const ac = new AudioController();
 const nSquares = 16;
 const nBalls = 4;
 var isInitiated = false;
-var mobileUsage = false;
 var fxEnable = false;
 
 function createUIElements() {
@@ -43,28 +42,12 @@ function initUILogic() {
   };
 
   balls.forEach((ball) => {
-    // Helper to extract position from event
-    function getPositionFromEvent(e: MouseEvent | TouchEvent): {
-      x: number;
-      y: number;
-    } {
-      if (e instanceof TouchEvent && (e.touches || e.changedTouches)) {
-        const touches = e.touches.length > 0 ? e.touches : e.changedTouches
-        return { x: touches[0].clientX, y: touches[0].clientY };
-      } else if (e instanceof MouseEvent) {
-        return { x: e.clientX, y: e.clientY };
-      } else {
-        throw new Error("Unsupported event type");
-      }
-    }
-
     // Common function for starting the drag
     function startDrag(e: MouseEvent | TouchEvent) {
       e.preventDefault();
       const originSquare = ball.parentElement as HTMLElement;
       ball.setAttribute("origin-square", originSquare.id);
       ball.setAttribute("clicked", "true");
-      mobileUsage = e.type === "touchstart";
       console.log(`[${e.type}] Lifted`, ball.id, "from", originSquare.id);
     }
 
@@ -73,8 +56,8 @@ function initUILogic() {
       e.preventDefault();
       if (ball.getAttribute("clicked") !== "true") return;
       const position = getPositionFromEvent(e);
-      ball.style.left = `${position.x - 25}px`;
-      ball.style.top = `${position.y - 25}px`;
+      ball.style.left = `${position.x - 50}px`;
+      ball.style.top = `${position.y - 50}px`;
       // console.log(`[${e.type}] Moving/Dragging`, ball.id);
     }
 
@@ -103,6 +86,21 @@ function initUILogic() {
     ball.addEventListener("touchmove", doDrag);
     ball.addEventListener("touchend", endDrag);
   });
+}
+
+// Helper to extract position from event
+function getPositionFromEvent(e: MouseEvent | TouchEvent): {
+  x: number;
+  y: number;
+} {
+  if (e instanceof TouchEvent && (e.touches || e.changedTouches)) {
+    const touches = e.touches.length > 0 ? e.touches : e.changedTouches;
+    return { x: touches[0].clientX, y: touches[0].clientY };
+  } else if (e instanceof MouseEvent) {
+    return { x: e.clientX, y: e.clientY };
+  } else {
+    throw new Error("Unsupported event type");
+  }
 }
 
 function initFXUI() {
