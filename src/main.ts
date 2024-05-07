@@ -209,8 +209,8 @@ async function initAudio() {
     "stems/dnb-124.wav",
     "stems/drums.wav",
     "stems/hats.wav",
-    "stems/kick-hat.wav",
-    "stems/smooth-chords.wav",
+    "stems/keep-on.wav",
+    "stems/what-u-doin-to-me.wav",
     "stems/extacy.wav",
   ]);
   isInitiated = true;
