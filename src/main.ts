@@ -195,15 +195,15 @@ async function initAudio() {
   }
   await ac.initAudio([
     "stems/4-on-floor.wav",
-    "stems/bass.wav",
     "stems/dnb-124.wav",
     "stems/drums.wav",
     "stems/hats.wav",
     "stems/kick-hat.wav",
-    "stems/smooth-chords.wav",
     "stems/toms.wav",
-    "stems/guitar.wav",
+    "stems/smooth-chords.wav",
     "stems/bass.wav",
+    "stems/bzzz.wav",
+    "stems/guitar.wav",
     "stems/dnb-124.wav",
     "stems/drums.wav",
     "stems/hats.wav",
