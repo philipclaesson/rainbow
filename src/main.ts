@@ -225,10 +225,12 @@ function spinner(show: boolean) {
 
 function createStartButton() {
   const startButton = document.getElementById("start-button");
-  const info = document.getElementById("info");
+  const info1 = document.getElementById("info-1");
+  const info2 = document.getElementById("info-2");
   startButton?.addEventListener("click", async () => {
     startButton.remove();
-    info?.remove();
+    info1?.remove();
+    info2?.remove();
     spinner(true);
     await initAudio();
     spinner(false);
