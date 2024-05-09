@@ -89,11 +89,8 @@ function initUILogic() {
 }
 
 // Helper to extract position from event
-function getPositionFromEvent(e: MouseEvent | TouchEvent): {
-  x: number;
-  y: number;
-} {
-  if (e instanceof TouchEvent && (e.touches || e.changedTouches)) {
+function getPositionFromEvent(e: any) {
+  if (typeof TouchEvent !== 'undefined' && e instanceof TouchEvent && (e.touches || e.changedTouches)) {
     const touches = e.touches.length > 0 ? e.touches : e.changedTouches;
     return { x: touches[0].clientX, y: touches[0].clientY };
   } else if (e instanceof MouseEvent) {
@@ -102,6 +99,7 @@ function getPositionFromEvent(e: MouseEvent | TouchEvent): {
     throw new Error("Unsupported event type");
   }
 }
+
 
 function initFXUI() {
   if (!fxEnable) {
