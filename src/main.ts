@@ -5,6 +5,7 @@ const nSquares = 16;
 const nBalls = 4;
 var isInitiated = false;
 var fxEnable = false;
+var progressBar: HTMLElement | null = null;
 
 function createUIElements() {
   // Create FX ui
@@ -119,7 +120,11 @@ function distanceFromBall(ball: HTMLElement, x: number, y: number) {
 
 // Helper to extract position from event
 function getPositionFromEvent(e: any) {
-  if (typeof TouchEvent !== 'undefined' && e instanceof TouchEvent && (e.touches || e.changedTouches)) {
+  if (
+    typeof TouchEvent !== "undefined" &&
+    e instanceof TouchEvent &&
+    (e.touches || e.changedTouches)
+  ) {
     const touches = e.touches.length > 0 ? e.touches : e.changedTouches;
     return { x: touches[0].clientX, y: touches[0].clientY };
   } else if (e instanceof MouseEvent) {
@@ -128,7 +133,6 @@ function getPositionFromEvent(e: any) {
     throw new Error("Unsupported event type");
   }
 }
-
 
 function initFXUI() {
   if (!fxEnable) {
@@ -246,9 +250,29 @@ async function initAudio() {
 function spinner(show: boolean) {
   if (show) {
     createElement("div", "spinner", "spinner", document.body);
+    progressBar = createElement(
+      "progress",
+      "progress",
+      "progress",
+      document.body
+    );
+    setTimeout(setProgress, 100);
   } else {
     const spinner = document.getElementById("spinner");
     spinner?.remove();
+    progressBar?.remove();
+  }
+}
+
+function setProgress() {
+  if (!progressBar) {
+    return;
+  }
+  const p = ac.loadedFiles / 16;
+  console.log("Progress:", p);
+  progressBar.setAttribute("value", p.toString());
+  if (p != 1) {
+    setTimeout(setProgress, 100);
   }
 }
 

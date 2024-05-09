@@ -4,6 +4,7 @@ export declare class AudioController {
     private slowAverage;
     private fx1a;
     private fx1b;
+    loadedFiles: number;
     constructor();
     initAudio(fileNames: string[]): Promise<void>;
     private loadAudioFile;

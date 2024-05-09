@@ -8,6 +8,7 @@ export class AudioController {
   private slowAverage: number = 39; // orange
   private fx1a: BiquadFilterNode | null = null;
   private fx1b: DelayNode | null = null;
+  public loadedFiles: number = 0;
 
   constructor() {
     this.audioContext = new AudioContext();
@@ -62,6 +63,8 @@ export class AudioController {
   private async loadAudioFile(url: string): Promise<AudioBuffer> {
     const response = await fetch(url);
     const arrayBuffer = await response.arrayBuffer();
+    this.loadedFiles++;
+    console.log(`Loaded ${this.loadedFiles} files.`)
     return this.audioContext.decodeAudioData(arrayBuffer);
   }
 
