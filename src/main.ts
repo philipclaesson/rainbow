@@ -33,7 +33,7 @@ function createUIElements() {
 
 function initUILogic() {
   const balls: NodeListOf<HTMLElement> = document.querySelectorAll(".ball");
-
+  var mouseDown = false;
   // Drops a ball into a target element and mutes the track the ball came from
   const dropBall = (ball: HTMLElement, target: HTMLElement) => {
     console.log("Dropped:", ball.id, target.id);
@@ -86,6 +86,35 @@ function initUILogic() {
     ball.addEventListener("touchmove", doDrag);
     ball.addEventListener("touchend", endDrag);
   });
+  document.addEventListener("mouseup", (e) => {
+    mouseDown = false;
+  });
+  document.addEventListener("mousedown", (e) => {
+    mouseDown = true;
+  });
+  document.addEventListener("mousemove", (e) => {
+    if (!mouseDown) return;
+    const position = getPositionFromEvent(e);
+    var clickedBall: HTMLElement | null = balls[0];
+
+    balls.forEach((ball) => {
+      clickedBall = null;
+      if (ball.getAttribute("clicked") === "true") {
+        clickedBall = ball;
+      }
+    });
+    if (!clickedBall) return;
+    if (distanceFromBall(clickedBall, e.clientX, e.clientY) == 0) return;
+    clickedBall.style.left = `${position.x - 50}px`;
+    clickedBall.style.top = `${position.y - 50}px`;
+  });
+}
+
+function distanceFromBall(ball: HTMLElement, x: number, y: number) {
+  const rect = ball.getBoundingClientRect();
+  const ballX = rect.left + rect.width / 2;
+  const ballY = rect.top + rect.height / 2;
+  return Math.sqrt((ballX - x) ** 2 + (ballY - y) ** 2);
 }
 
 // Helper to extract position from event

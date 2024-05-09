@@ -94,7 +94,6 @@ export class AudioController {
     if (trackNumber >= this.tracks.length) {
       throw new Error(`Track ${trackNumber} does not exist.`);
     }
-    console.log("Enabling track", trackNumber, enable)
     this.tracks[trackNumber].gainNode.gain.value = enable ? 0.5 : 0;
   }
 
