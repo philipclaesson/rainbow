@@ -6,6 +6,7 @@ const nBalls = 4;
 var isInitiated = false;
 var fxEnable = false;
 var progressBar: HTMLElement | null = null;
+var windowSize = { width: 0, height: 0 };
 
 function createUIElements() {
   // Create FX ui
@@ -107,6 +108,19 @@ function initUILogic() {
     if (distanceFromBall(clickedBall, e.clientX, e.clientY) == 0) return;
     clickedBall.style.left = `${position.x - 50}px`;
     clickedBall.style.top = `${position.y - 50}px`;
+  });
+
+  windowSize.width = window.innerWidth;
+  windowSize.height = window.innerHeight;
+  window.addEventListener("resize", () => {
+    const oldHeight = windowSize.height;
+    const oldWidth = windowSize.width;
+    windowSize.width = window.innerWidth;
+    windowSize.height = window.innerHeight;
+    balls.forEach((ball) => {
+      ball.style.left = `${(parseFloat(ball.style.left) / oldWidth) * windowSize.width}px`;
+      ball.style.top = `${(parseFloat(ball.style.top) / oldHeight) * windowSize.height}px`;
+    });
   });
 }
 
