@@ -98,12 +98,11 @@ function initUILogic() {
     const position = getPositionFromEvent(e);
     var clickedBall: HTMLElement | null = balls[0];
 
-    balls.forEach((ball) => {
-      clickedBall = null;
-      if (ball.getAttribute("clicked") === "true") {
-        clickedBall = ball;
+    for (let i = 0; i < balls.length; i++) {
+      if (balls[i].getAttribute("clicked") === "true"){
+        clickedBall = balls[i];
       }
-    });
+    }
     if (!clickedBall) return;
     if (distanceFromBall(clickedBall, e.clientX, e.clientY) == 0) return;
     clickedBall.style.left = `${position.x - 50}px`;
