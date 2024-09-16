@@ -239,24 +239,47 @@ async function initAudio() {
   if (isInitiated) {
     return;
   }
-  await ac.initAudio([
-    "stems/4-on-floor.wav",
-    "stems/dnb-124.wav",
-    "stems/drums.wav",
-    "stems/hats.wav",
-    "stems/kick-hat.wav",
-    "stems/toms.wav",
-    "stems/smooth-chords.wav",
-    "stems/bass.wav",
-    "stems/bzzz.wav",
-    "stems/guitar.wav",
-    "stems/dnb-124.wav",
-    "stems/drums.wav",
-    "stems/hats.wav",
-    "stems/keep-on.wav",
-    "stems/what-u-doin-to-me.wav",
-    "stems/extacy.wav",
-  ]);
+  const pack1 = [
+    "stems/pack1/4-on-floor.wav",
+    "stems/pack1/dnb-124.wav",
+    "stems/pack1/drums.wav",
+    "stems/pack1/hats.wav",
+    "stems/pack1/kick-hat.wav",
+    "stems/pack1/toms.wav",
+    "stems/pack1/smooth-chords.wav",
+    "stems/pack1/bass.wav",
+    "stems/pack1/bzzz.wav",
+    "stems/pack1/guitar.wav",
+    "stems/pack1/dnb-124.wav",
+    "stems/pack1/drums.wav",
+    "stems/pack1/hats.wav",
+    "stems/pack1/keep-on.wav",
+    "stems/pack1/what-u-doin-to-me.wav",
+    "stems/pack1/extacy.wav",
+  ];
+
+  const pack2 = [
+    "stems/pack2/4-floor-badam.wav",
+    // "stems/pack2/4-floor-more.wav",
+    "stems/pack2/groovy-drums.wav",
+    // "stems/pack2/drum-thing.wav",
+    "stems/pack2/drums-pstju.wav",
+    "stems/pack2/drums-tikitiki.wav",
+    "stems/pack2/drums-with-laser.wav",
+    // "stems/pack2/snare-hat-blipp.wav",
+    "stems/pack2/fat-bass.wav",
+    "stems/pack2/bass.wav",
+    "stems/pack2/house-bass.wav",
+    "stems/pack2/groovy-synth.wav",
+    "stems/pack2/pluck-synth.wav",
+    "stems/pack2/house-chords.wav",
+    "stems/pack2/spacy-chords.wav",
+    "stems/pack2/surr.wav",
+    "stems/pack2/hehehe.wav",
+    "stems/pack2/thats-all.wav",
+    "stems/pack2/all-that-i-can-do.wav",
+  ];
+  await ac.initAudio(pack1);
   isInitiated = true;
 }
 
